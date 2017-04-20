@@ -27,19 +27,19 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping(value="/user")
-@Transactional
 public class UserController {
-	@Resource
-	private SessionFactory sessionFactory;
+
+	private SessionFactory sessionFactory=HibernateUtil.getSessionFactory();
 	//用户登录
 	@RequestMapping(value="/login")
 	@ResponseBody
  	public Chater UserLogin(String userId,String password){
-
 		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
 		User user = (User) session.createQuery("from User where userId=:userId")
 		.setParameter("userId", userId)
 		.uniqueResult();
+		session.getTransaction().commit();
 		Chater chater = new Chater();
 		chater.setUserId(userId);
 		chater.setOrder("login");
@@ -63,6 +63,7 @@ public class UserController {
 	public Chater UserRegist(String userId,String username,String password){
 
 		Session session = sessionFactory.getCurrentSession();
+		session.beginTransaction();
 		User user = (User) session.createQuery("from User where userId=:userId")
 		.setParameter("userId", userId)
 		.uniqueResult();
@@ -80,20 +81,16 @@ public class UserController {
 		user.setUserId(userId);
 		user.setUsername(username);
 		session.save(user);
-
+		session.getTransaction().commit();
 		chater.setMessage("SUCCEED");
 		return chater;
 	}
 	//暖场游戏
 	@RequestMapping(value="/warmgame")
 	@ResponseBody
-
 	public Chater WarmGame(String level, HttpServletRequest request){
-			List<WarmGame> warmGamelist= null;
 			Session session=sessionFactory.getCurrentSession();
 			session.beginTransaction();
-			warmGamelist = session.createQuery("from WarmGame where warmGameLevel=:level").setParameter("level",level)
-					.list();
 			String decode=null;
 			try {
 				decode= URLDecoder.decode(level,"utf-8");
@@ -102,16 +99,16 @@ public class UserController {
 				return new Chater();
 			}
 
-			List<WarmGame> WarmGamelist = session.createQuery("from WarmGame where warmGameLevel=:WarmGameLevel")
+			List<WarmGame> warmGamelist = session.createQuery("from WarmGame where warmGameLevel=:WarmGameLevel")
 					.setParameter("WarmGameLevel", decode)
                     .list();
 			session.getTransaction().commit();
 			String localAddr = request.getLocalAddr();
 			// 设定返回值
-			for (int i = 0; i <WarmGamelist.size(); i++) {
-				String url=WarmGamelist.get(i).getWarmGameUrl();
+			for (int i = 0; i <warmGamelist.size(); i++) {
+				String url=warmGamelist.get(i).getWarmGameUrl();
 				url=url.replace("\\","/");
-				WarmGamelist.get(i).setWarmGameUrl("http://"+localAddr+":8099/user/download?url="+url);
+				warmGamelist.get(i).setWarmGameUrl("http://"+localAddr+":8099/user/download?url="+url);
 			}
 			Chater chater = new Chater();
 			chater.setOrder("warmgame");
@@ -120,9 +117,9 @@ public class UserController {
 			object.put("list", new Gson().toJson(warmGamelist));
 			chater.setObject(object);
 			chater.setMessage("SUCCEED");
+
 			return chater;
 	}
-	//惩罚
 
 	@RequestMapping("/test")
 	@ResponseBody
@@ -145,7 +142,7 @@ public class UserController {
 
 	@RequestMapping("/download")
     @ResponseBody
-	public void downloadFile(String url,HttpServletResponse response){
+	public Chater downloadFile(String url,HttpServletResponse response){
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("multipart/form-data");
 		response.setHeader("Content-Disposition", "attachment;fileName="+url);
@@ -170,21 +167,26 @@ public class UserController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		Chater chater=new Chater();
+		chater.setOrder("download");
+		chater.setMessage("SUCCEED");
+		return chater;
 	}
 
     @RequestMapping("/upload")
     @ResponseBody
-    public void uploadFile(HttpServletRequest request,@RequestParam("excelFile")MultipartFile file){
+    public Chater uploadFile(HttpServletRequest request,@RequestParam("excelFile")MultipartFile file){
         //获取上传文件的名称
-        String filePath = file.getOriginalFilename();
-        File file2 = new File("file");
+        String filename = file.getOriginalFilename();
+        File file2 = new File("C:\\Users\\Administrator\\Desktop\\hiparty\\hipartyDB\\loadfile\\");
         if (!file2.exists()) {
             //创建临时目录
             file2.mkdir();
         }
         try {
             //文件存放的路径
-        FileOutputStream fileOutputStream = new FileOutputStream(file2+"/"+filePath);
+        FileOutputStream fileOutputStream = new FileOutputStream(file2+"/"+filename);
         fileOutputStream.write(file.getBytes());
         fileOutputStream.flush();
         fileOutputStream.close();
@@ -195,6 +197,16 @@ public class UserController {
         }
         Session session=sessionFactory.getCurrentSession();
         session.beginTransaction();
-        Fi
-    }
+		LoadFile loadFile=new LoadFile();
+		loadFile.setFilename(filename);
+		loadFile.setFileUrl("C:\\Users\\Administrator\\Desktop\\hiparty\\hipartyDB\\loadfile\\"+filename);
+		session.save(loadFile);
+		session.getTransaction().commit();
+
+		Chater chater =new Chater();
+		chater.setMessage("SUCCEED");
+		chater.setOrder("upload");
+		return  chater;
+	}
+
 }

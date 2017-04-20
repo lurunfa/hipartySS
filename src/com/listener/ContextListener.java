@@ -3,11 +3,16 @@ package com.listener;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import com.beans.Lab;
+import com.beans.Room;
+import com.beans.RoomUser;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -46,5 +51,23 @@ public class ContextListener implements ServletContextListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		TestLab();
     }
+
+	private void TestLab() {
+		Lab lab=Lab.getLab();
+		Room room=new Room();
+		room.setRoomId("111");
+		room.setRoomname("test");
+		room.setRoomnum(1);
+		room.setHostId("123");
+		RoomUser roomuser=new RoomUser();
+		roomuser.setUserId("123");
+		roomuser.setNickname("nick");
+		List<RoomUser> list=new ArrayList<>();
+		list.add(roomuser);
+		room.setUserlist(list);
+		lab.setList(room);
+	}
+
 }

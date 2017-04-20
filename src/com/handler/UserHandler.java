@@ -58,8 +58,6 @@ public class UserHandler implements IoHandler {
 				break;
 			case "talk":handleTalk(iossession,chater);
 				break;
-//			case "warmgame":handleWarmGame(iossession,chater);
-//				break;
 			case "ensure_warmgame":handleEnsureWarmGame(iossession,chater);
 				break;
 			case "searchroom":handleSearchRoom(iossession,chater);
@@ -103,23 +101,6 @@ public class UserHandler implements IoHandler {
 		chater2.setOrder("beginwerewolf");
 		chater2.setRoomId(chater.getRoomId());
 
-		int playnum=0;
-		playnum+=werewolf.getVillagernum()+werewolf.getWerewolfnum();
-		if(werewolf.isSeerIs()) playnum++;
-		if(werewolf.isWitchIs()) playnum++;
-		if(werewolf.isHunterIs()) playnum++;
-		if(werewolf.isIdiotIs()) playnum++;
-		if(werewolf.isGirlIs()) playnum++;
-		if(werewolf.isCupidIs()) playnum++;
-		if(werewolf.isGuardIs()) playnum++;
-		if(werewolf.isThiefIs()) playnum++;
-		if(werewolf.isPresbyterIs()) playnum++;
-		if(playnum!=playerlist.size()){
-			chater2.setMessage("参加人数不匹配");
-			chater2.setUserId(chater.getUserId());
-			SendSingle(chater2,iossession);
-		}
-		else {
 			//上帝
 			chater2.setMessage("God");
 			chater2.setUserId(werewolf.getGodId());
@@ -213,7 +194,6 @@ public class UserHandler implements IoHandler {
 				chater2.setUserId(player.getUserId());
 				SendSingle(chater2, player.getSession());
 			}
-		}
 	}
 
 	private void handleWerewolf(IoSession iossession, Chater chater) {
@@ -272,7 +252,6 @@ public class UserHandler implements IoHandler {
 		SendAll(chater2, chater.getRoomId());
 
 	}
-
 
 	private void handleTalk(IoSession iossession, Chater chater) {
 
@@ -408,7 +387,7 @@ public class UserHandler implements IoHandler {
 		Room room = LabUtils.FindRoom(chater.getRoomId());
 		room.getRoomutils().setCount(room.getRoomutils().getCount()-1);
 
-		String message=room.getUserlist().get(0).getNickname();
+		String message="1:"+room.getUserlist().get(0).getNickname();
 		for(int j=1;j<room.getRoomnum();j++){
 			message=message+'\n'+(j+1)+":"+room.getUserlist().get(j).getNickname();
 		}
@@ -427,8 +406,8 @@ public class UserHandler implements IoHandler {
 		else if(now.getTime()-room.getRoomutils().getIntroducestart().getTime()>30000){
 			SendAll(chater2, chater.getRoomId());
 		}
-		//chater新建？
-		SendSingle(chater2, iossession);
+//		//chater新建？
+//		SendSingle(chater2, iossession);
 	}
 
 	private void handleIntroduce(IoSession iossession, Chater chater) {

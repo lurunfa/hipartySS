@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class LoadFile {
     private String Filename;
     private int id;
+    private String FileUrl;
 
     public String getFilename() {
         return Filename;
@@ -28,14 +29,6 @@ public class LoadFile {
         this.id = id;
     }
 
-    public String getFileId() {
-        return FileId;
-    }
-
-    public void setFileId(String fileId) {
-        FileId = fileId;
-    }
-
     public String getFileUrl() {
         return FileUrl;
     }
@@ -44,6 +37,4 @@ public class LoadFile {
         FileUrl = fileUrl;
     }
 
-    private String FileId;
-    private String FileUrl;
 }

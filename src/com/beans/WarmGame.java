@@ -9,15 +9,6 @@ public class WarmGame {
 	private String warmGameLevel;
 	private String warmGameId;
 	private String warmGame;
-
-	public String getWarmGameUrl() {
-		return warmGameUrl;
-	}
-
-	public void setWarmGameUrl(String warmGameUrl) {
-		this.warmGameUrl = warmGameUrl;
-	}
-
 	private String warmGameUrl;
 	private int id;
 
@@ -60,7 +51,6 @@ public class WarmGame {
 	public void setWarmGameUrl(String warmGameUrl) {
 		this.warmGameUrl = warmGameUrl;
 	}
-
 	@Id
 	@GeneratedValue
 	public int getId() {
